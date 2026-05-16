@@ -8,6 +8,7 @@ idna==3.12
 joblib==1.5.3
 numpy==1.26.4
 pandas==3.0.2
+psycopg2-binary==2.9.10
 pydantic==2.9.0
 pydantic_core==2.23.2
 python-dateutil==2.9.0.post0

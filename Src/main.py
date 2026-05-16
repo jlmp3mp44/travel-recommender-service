@@ -3,11 +3,13 @@ FastAPI microservice for collaborative-filtering recommendations (SVD).
 """
 
 import logging
+from contextlib import asynccontextmanager
 from typing import Dict, List
 
 from fastapi import FastAPI, HTTPException
 from pydantic import BaseModel, Field
 
+from auto_retrain import PeriodicRetrainer
 from svd_model import recommender
 
 logging.basicConfig(
@@ -16,7 +18,19 @@ logging.basicConfig(
 )
 logger = logging.getLogger(__name__)
 
-app = FastAPI(title="Recommender Service", version="1.0.0")
+retrainer = PeriodicRetrainer(recommender)
+
+
+@asynccontextmanager
+async def lifespan(_: FastAPI):
+    retrainer.start()
+    try:
+        yield
+    finally:
+        retrainer.stop()
+
+
+app = FastAPI(title="Recommender Service", version="1.0.0", lifespan=lifespan)
 
 
 # ── Request / Response schemas ───────────────────────────────────────
